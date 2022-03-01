@@ -128,10 +128,15 @@ mapper接口
     }
 ```
 我途中遇到的问题
+
 1. mybatis的配置文件中，写成这样会有时区的问题（8.0版本以上的connector会有这个问题）
+
 ``<property name="url" value="jdbc:mysql://localhost:3306/MyBatis"/>``
+
 改成这个就行
+
 ```<property name="url" value="jdbc:mysql://localhost:3306/mybatis?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"/>```
+
 2. mybatis的配置文件记得更新映射文件
 
 **重点**
