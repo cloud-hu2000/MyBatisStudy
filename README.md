@@ -53,7 +53,7 @@ MyBatis
     </dependencies>
 ```
 
-### 配置配置文件
+### 配置映射文件
 在src/main/resources的路径下创建名为mybatis-config.xml的配置文件，并添加以下代码
 ```
 <?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
@@ -89,9 +89,9 @@ MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅�
 
 创建数据表
 ![](@attachment/Clipboard_2022-03-01-22-16-26.png)
-实体类
+创建实体类
 ![](@attachment/Clipboard_2022-03-01-22-17-25.png)
-mapper接口
+创建mapper接口
 ![](@attachment/Clipboard_2022-03-01-22-17-41.png)
 
 ### 创建映射文件
@@ -127,7 +127,8 @@ mapper接口
         }
     }
 ```
-我途中遇到的问题
+
+我途中遇到的问题：
 
 1. mybatis的配置文件中，写成这样会有时区的问题（8.0版本以上的connector会有这个问题）
 
@@ -140,4 +141,83 @@ mapper接口
 2. mybatis的配置文件记得更新映射文件
 
 **重点**
-获取Mapper接口的实现类，将Mapper接口转为实现类的工作是在sqlSession的getMapper方法中去做的
+
+获取Mapper接口的实现类，将Mapper接口转为实现类的工作是在sqlSession的getMapper方法中去做的，原理是使用代理模式
+
+
+### 增删改查
+
+先编写接口中的方法
+![](@attachment/Clipboard_2022-03-04-16-54-16.png)
+再在映射文件中进行配置
+![](@attachment/Clipboard_2022-03-04-16-55-35.png)
+
+需要提到的是，查询的配置语句需要加resultType或者resultMap来指定查询结果对应的哪个类
+resultType是默认的映射关系（用于属性名和字段名一致的情况）
+resultMap是自定义的映射关系（用于一对多或者多对一或字段名与属性名不一致的情况）
+
+### 加入log4j日志功能
+
+**注意**
+log4j被曝有重大bug，在学习过程中可以暂时不用管版本问题，但在实际应用中应使用2.14.1及以上版本
+具体bug在此处不详述，具体参考[log4j漏洞的产生原因和解决方案，小白都能看懂！！！！](https://zhuanlan.zhihu.com/p/444814529)
+
+添加依赖
+```
+<dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
+</dependency>
+```
+
+配置映射文件
+```
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <param name="Encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-5p %d{MM-dd HH:mm:ss,SSS} %m (%F:%L) \n"/>
+        </layout>
+    </appender>
+    <logger name="java.sql">
+        <level value="debug"/>
+    </logger>
+    <logger name="org.apache.ibatis">
+        <level value="info"/>
+    </logger>
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</log4j:configuration>
+```
+
+
+日志的级别
+FATAL(致命)>ERROR(错误)>WARN(警告)>INFO(信息)>DEBUG(调试)
+从左到右打印的内容越来越详细
+
+
+### 一些修改和优化
+#### 1.将mybatis-config的部分参数放到properties文件中
+
+jdbc.properties内容如下
+```
+jdbc.driver=com.mysql.cj.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/mybatis?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+jdbc.username=root
+jdbc.password=zxcvbnm,./123
+```
+
+mybatis-config.xml中的dataSource部分修改为以下内容
+```
+<dataSource type="POOLED">
+    <property name="driver" value="${jdbc.driver}"/>
+    <property name="url" value="${jdbc.url}"/>
+    <property name="username" value="${jdbc.username}"/>
+    <property name="password" value="${jdbc.password}"/>
+</dataSource>
+```
+
