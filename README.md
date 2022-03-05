@@ -71,7 +71,7 @@ MyBatis
                 <!--<property name="url" value="jdbc:mysql://localhost:3306/MyBatis"/>-->
                 <property name="url" value="jdbc:mysql://localhost:3306/mybatis?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"/>
                 <property name="username" value="root"/>
-                <property name="password" value="zxcvbnm,./123"/>
+                <property name="password" value="123456"/>
             </dataSource>
         </environment>
     </environments>
@@ -159,6 +159,7 @@ resultMap是自定义的映射关系（用于一对多或者多对一或字段�
 ### 加入log4j日志功能
 
 **注意**
+
 log4j被曝有重大bug，在学习过程中可以暂时不用管版本问题，但在实际应用中应使用2.14.1及以上版本
 具体bug在此处不详述，具体参考[log4j漏洞的产生原因和解决方案，小白都能看懂！！！！](https://zhuanlan.zhihu.com/p/444814529)
 
@@ -208,7 +209,7 @@ jdbc.properties内容如下
 jdbc.driver=com.mysql.cj.jdbc.Driver
 jdbc.url=jdbc:mysql://localhost:3306/mybatis?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
 jdbc.username=root
-jdbc.password=zxcvbnm,./123
+jdbc.password=123456
 ```
 
 mybatis-config.xml中的dataSource部分修改为以下内容
