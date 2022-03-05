@@ -1,5 +1,9 @@
 # Mybatis学习笔记（保持更新）
 
+## 声明
+
+本笔记源于尚硅谷的教程再加上自己的总结，如果有不明白的地方需要参考原教程[MyBatis教程](https://www.bilibili.com/video/BV1VP4y1c7j7?p=25&spm_id_from=pageDriver)
+
 ### 特性
 1.是一个半自动的ORM框架
 2.支持定制化SQL、存储过程以及高级映射
@@ -88,17 +92,17 @@ MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅�
 提供实现类。
 
 创建数据表
-![](@attachment/Clipboard_2022-03-01-22-16-26.png)
+![](readme_img/Clipboard_2022-03-01-22-16-26.png)
 创建实体类
-![](@attachment/Clipboard_2022-03-01-22-17-25.png)
+![](readme_img/Clipboard_2022-03-01-22-17-25.png)
 创建mapper接口
-![](@attachment/Clipboard_2022-03-01-22-17-41.png)
+![](readme_img/Clipboard_2022-03-01-22-17-41.png)
 
 ### 创建映射文件
 要点1：映射文件中mapper的命名空间与全类名一致
-![](@attachment/Clipboard_2022-03-01-22-35-14.png)
+![](readme_img/Clipboard_2022-03-01-22-35-14.png)
 要点2：映射文件中SQL语句的id和mapper接口的方法名一致
-![](@attachment/Clipboard_2022-03-01-22-37-23.png)
+![](readme_img/Clipboard_2022-03-01-22-37-23.png)
 
 
 ### 测试功能
@@ -148,9 +152,9 @@ MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅�
 ### 增删改查
 
 先编写接口中的方法
-![](@attachment/Clipboard_2022-03-04-16-54-16.png)
+![](readme_img/Clipboard_2022-03-04-16-54-16.png)
 再在映射文件中进行配置
-![](@attachment/Clipboard_2022-03-04-16-55-35.png)
+![](readme_img/Clipboard_2022-03-04-16-55-35.png)
 
 需要提到的是，查询的配置语句需要加resultType或者resultMap来指定查询结果对应的哪个类
 resultType是默认的映射关系（用于属性名和字段名一致的情况）
@@ -222,3 +226,57 @@ mybatis-config.xml中的dataSource部分修改为以下内容
 </dataSource>
 ```
 
+#### 2.将mapper的映射文件改为接受传参的方式
+
+##### 只有一个参数的情况
+
+有两种方式，以getUserById方法为例进行演示
+
+第一种是#{}，原理是占位符，所以参数不用打引号
+```
+<!--  User getUserById(int id);  -->
+<select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where id = #{id}
+</select>
+```
+第二种是${}，原理是字符串拼接，所以参数需要打引号
+```
+<!--  User getUserById(int id);  -->
+<select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where id = '${id}'
+</select>
+```
+
+##### 有多个参数的情况
+
+默认只能使用arg0,arg1...来表示参数或者param1,param2...（注意一个是0基，一个是1基）
+原理是mybatis将参数放进了map中，以两种方式进行储存
+a>以arg0，arg1为键，以参数为值
+b>以param1,param2为键，以参数为值
+```
+<!--  User checkLogin(String userName,String password);  -->
+<select id="checkLogin" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where username = #{arg0} and password = #{arg1}
+</select>
+```
+
+若不想使用arg0这种形式，则可以把参数先放进一个map中，将map作为参数传进来就即可。
+或者使用@Param()注解为参数命名
+
+
+##### 使用pojo作为参数的情况
+
+同上即可，但需要注意，属性名有大小写的分别，#{userName}属性不能写成#{username}
+
+```
+<!--int insertUser(User user);-->
+<insert id="insertUser">
+    insert into t_user values (null,#{userName},#{password})
+</insert>
+```
+
+##### @Param()注解的使用
+
+在mapper接口处使用该注解
+
+``User checkLoginByParam(@Param("username") String userName, @Param("password")String password);``

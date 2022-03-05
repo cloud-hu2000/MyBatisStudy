@@ -25,7 +25,10 @@ public class test {
             //获取Mapper接口的实例对象
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             //测试功能
-            userMapper.insertUser();
+            User user = new User();
+            user.setUserName("添加的名字");
+            user.setPassword("456");
+            userMapper.insertUser(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,7 +86,8 @@ public class test {
             //获取Mapper接口的实例对象
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             //测试功能
-            userMapper.getUserById();
+            User user = userMapper.getUserById(4);
+            System.out.println(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,6 +109,48 @@ public class test {
             //测试功能
             List <User> list=userMapper.getAllUser();
             System.out.println(list.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCheckLogin(){
+        try {
+            //加载核心配置文件
+            InputStream is = Resources.getResourceAsStream("mybatis-config.xml");
+            //获取sqlSessionFactoryBuilder
+            SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+            //使用配置文件创建的流来获取sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(is);
+            //获取sqlSession
+            SqlSession sqlSession=sqlSessionFactory.openSession(true);
+            //获取Mapper接口的实例对象
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            //测试功能
+            User user = userMapper.checkLogin("修改后的名字", "123");
+            System.out.println(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCheckLoginByParam(){
+        try {
+            //加载核心配置文件
+            InputStream is = Resources.getResourceAsStream("mybatis-config.xml");
+            //获取sqlSessionFactoryBuilder
+            SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+            //使用配置文件创建的流来获取sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(is);
+            //获取sqlSession
+            SqlSession sqlSession=sqlSessionFactory.openSession(true);
+            //获取Mapper接口的实例对象
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            //测试功能
+            User user = userMapper.checkLogin("修改后的名字", "123");
+            System.out.println(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
