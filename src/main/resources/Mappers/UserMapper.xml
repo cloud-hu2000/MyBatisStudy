@@ -4,5 +4,24 @@
 
 <mapper namespace="com.CloudHu.MyBatis.Mapper.UserMapper">
     <!--int insertUser();-->
-    <insert id="insertUser"> insert into t_user values (null,'aa','123') </insert>
+    <insert id="insertUser">
+        insert into t_user values (null,'aa','123')
+    </insert>
+    <!--  void updateUser();  -->
+    <update id="updateUser">
+        update t_user set username = '修改后的名字' where id = 4
+    </update>
+    <!--  void deleteUser();  -->
+    <delete id="deleteUser">
+        delete from t_user where id = 5
+    </delete>
+    <!--  User getUserById();  -->
+    <select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
+        select * from t_user where id = 4
+    </select>
+    <!--  List<User> getAllUser();  -->
+    <select id="getAllUser" resultType="com.CloudHu.MyBatis.POJO.User">
+        select * from t_user
+    </select>
+
 </mapper>
