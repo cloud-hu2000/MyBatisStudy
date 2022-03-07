@@ -17,7 +17,7 @@
     </delete>
     <!--  User getUserById(int id);  -->
     <select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user where id = '${id}'
+        select * from t_user where id = ${id}
     </select>
     <!--  List<User> getAllUser();  -->
     <select id="getAllUser" resultType="com.CloudHu.MyBatis.POJO.User">
@@ -31,5 +31,25 @@
     <select id="checkLoginByParam" resultType="com.CloudHu.MyBatis.POJO.User">
         select * from t_user where username = #{username} and password = #{password}
     </select>
+    <!--List<User> getUserByLike(@Param("username") String username);-->
+    <!--
+    有两种方式
+      select * from t_user where username like '%${username}%'
+      select * from t_user where username like "%"#{username}"%"
+      -->
+    <select id="getUserByLike" resultType="com.CloudHu.MyBatis.POJO.User">
+        select * from t_user where username like "%"#{username}"%"
+    </select>
+
+    <!--int deleteMore(@Param("ids") String ids);-->
+    <delete id="deleteMore">
+        delete from t_user where id in (${ids})
+    </delete>
+
+    <!--  User getUserByDynamicTableName(@Param("tablename")String tablename,@Param("id")int id);  -->
+    <select id="getUserByDynamicTableName" resultType="com.CloudHu.MyBatis.POJO.User">
+        select * from ${tablename} where id = ${id}
+    </select>
+
 
 </mapper>

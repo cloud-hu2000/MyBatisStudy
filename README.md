@@ -5,22 +5,24 @@
 本笔记源于尚硅谷的教程再加上自己的总结，如果有不明白的地方需要参考原教程[MyBatis教程](https://www.bilibili.com/video/BV1VP4y1c7j7?p=25&spm_id_from=pageDriver)
 
 ### 特性
+
 1.是一个半自动的ORM框架
+
 2.支持定制化SQL、存储过程以及高级映射
 
 ### 和其他技术的对比
 
-JDBC
+#### JDBC
 1. SQL语句夹杂，当需求更改时，代码更改困难
 2. 代码冗长，开发效率低
 
-Hibernate和JPA
+####Hibernate和JPA
 1. 操作简便，开发效率高
 2. 程序中的长难SQL需要绕过框架
 3. 内部自动产生的SQL，不容易做特殊优化
 4. 基于全映射，大量字段的POJO进行部分映射比较困难
 
-MyBatis
+####MyBatis
 1. 轻量级，性能好
 2. SQL 和 Java语句分开
 3. 效率略低于Hibernate，但能够接受
@@ -58,7 +60,14 @@ MyBatis
 ```
 
 ### 配置映射文件
+
 在src/main/resources的路径下创建名为mybatis-config.xml的配置文件，并添加以下代码
+
+<span id="jump3">**注意：
+核心配置文件中的标签必须按照固定的顺序：
+properties?,settings?,typeAliases?,typeHandlers?,objectFactory?,objectWrapperFactory?,reflectorF
+actory?,plugins?,environments?,databaseIdProvider?,mappers?**</sapn>
+
 ```
 <?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
@@ -92,10 +101,15 @@ MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅�
 提供实现类。
 
 创建数据表
+
 ![](readme_img/Clipboard_2022-03-01-22-16-26.png)
+
 创建实体类
+
 ![](readme_img/Clipboard_2022-03-01-22-17-25.png)
+
 创建mapper接口
+
 ![](readme_img/Clipboard_2022-03-01-22-17-41.png)
 
 ### 创建映射文件
@@ -152,8 +166,11 @@ MyBatis中的mapper接口相当于以前的dao。但是区别在于，mapper仅�
 ### 增删改查
 
 先编写接口中的方法
+
 ![](readme_img/Clipboard_2022-03-04-16-54-16.png)
+
 再在映射文件中进行配置
+
 ![](readme_img/Clipboard_2022-03-04-16-55-35.png)
 
 需要提到的是，查询的配置语句需要加resultType或者resultMap来指定查询结果对应的哪个类
@@ -226,24 +243,24 @@ mybatis-config.xml中的dataSource部分修改为以下内容
 </dataSource>
 ```
 
-#### 2.将mapper的映射文件改为接受传参的方式
+#### <span id = "jump2">2.将mapper的映射文件改为接受传参的方式</sapn>
 
 ##### 只有一个参数的情况
 
 有两种方式，以getUserById方法为例进行演示
 
-第一种是#{}，原理是占位符，所以参数不用打引号
+第一种是#{}，原理是占位符
 ```
 <!--  User getUserById(int id);  -->
 <select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
     select * from t_user where id = #{id}
 </select>
 ```
-第二种是${}，原理是字符串拼接，所以参数需要打引号
+第二种是${}，原理是字符串拼接
 ```
 <!--  User getUserById(int id);  -->
 <select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
-    select * from t_user where id = '${id}'
+    select * from t_user where id = ${id}
 </select>
 ```
 
@@ -261,7 +278,7 @@ b>以param1,param2为键，以参数为值
 ```
 
 若不想使用arg0这种形式，则可以把参数先放进一个map中，将map作为参数传进来就即可。
-或者使用@Param()注解为参数命名
+或者[使用@Param()注解为参数命名](#jump1)
 
 
 ##### 使用pojo作为参数的情况
@@ -277,6 +294,127 @@ b>以param1,param2为键，以参数为值
 
 ##### @Param()注解的使用
 
-在mapper接口处使用该注解
+<span id="jump1">在mapper接口处使用该注解</span>
 
 ``User checkLoginByParam(@Param("username") String userName, @Param("password")String password);``
+
+
+#### 一些特殊sql语句
+
+##### 1.模糊查询
+
+有两种方式
+
+第一种，使用#{}
+
+**注意：需要用双引号来括住百分号，不能使用单引号**
+
+```
+<select id="getUserByLike" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where username like "%"#{username}"%"
+</select>
+```
+
+第二种，使用${}
+
+```
+<select id="getUserByLike" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where username like '%${username}%'
+</select>
+```
+
+##### 2.批量删除
+
+sql在批量删除时需要用到引号，例如语句
+
+`delete from t_user where id in ('1,2,3')`
+
+在mapper的映射文件中，因为两种传参的原理不同，这就导致在配置批量删除的方法时，只能使用${}的方式,[原理差别](#jump2)在上文处提过
+
+${}方式
+
+```
+<!--int deleteMore(@Param("ids") String ids);-->
+<delete id="deleteMore">
+    delete from t_user where id in (${ids})
+</delete>
+```
+
+##### 3.动态表名
+
+之前使用的都是固定的表名，若要将表名当做参数，只能使用${}方式，原因和上方提到一样
+
+${}方式
+```
+<!--  User getUserByDynamicTableName(@Param("tablename")String tablename,@Param("id")int id);  -->
+<select id="getUserByDynamicTableName" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from ${tablename} where id = ${id}
+</select>
+```
+
+### 解决属性名和字段名不一致的问题
+
+有时会出现数据库中的字段名与后端中实体的属性名不一致的情况，此时需要在mapper的配置文件中做出修改，具体方法有三种。
+
+假设现在有一个员工(Emp)数据表，sql结构为eid,e_name
+
+员工实体类的属性为id,name
+
+（这里偷了个懒，没在演示代码里面添加这些内容）
+
+（但是底下给的代码应该没问题）
+
+（大概）
+
+#### 1.为字段起别名
+
+通过起别名的方式来使字段名与属性名相对应，别名即为属性名。
+
+```
+<!--  Emp getEmpById(int id);  -->
+<select id="getEmpById" resultType="com.CloudHu.MyBatis.POJO.Emp">
+    select eid id,e_name name from t_emp where eid = ${id}
+</select>
+```
+
+#### 2.设置驼峰命名法
+
+mybatis支持将下划线转为驼峰命名法，例如将Emp_name转为EmpName。使用这个方法的前提是转化后的sql的字段名与属性名可以对应，在我举的例子里这个方法是行不通的，得把属性名改成eName才行。
+
+
+下面是具体操作方法，在mybatis的核心配置文件中添加以下代码,注意[核心配置文件的语序](#jump3)。
+
+
+```
+<settings>
+    <setting name="mapUnderscoreToCamelCase" value="true" /><setting>
+</settings>
+```
+
+#### 3.使用resultMap手动指定映射关系
+
+
+
+在mapper的映射文件中添加以下代码
+
+```
+<!--注意这里的id与下面的resultMap相对应-->
+<resultMap id="empResultMap" type="Emp">
+
+    <!--主键-->
+    <!--property对应着sql的字段名，column对应着后端实体的属性名-->
+    <id property="eid" column="id"></id>
+    
+    <!--其他属性-->
+    <!--property对应着sql的字段名，column对应着后端实体的属性名-->
+    <result property="e_name" column="name"></result>
+    
+</resultMap>
+
+
+<!--  Emp getAllEmp();  -->
+<select id="getAllEmp" resultMap="empResultMap">
+    select * from t_emp
+</select>
+
+```

@@ -1,5 +1,6 @@
 import com.CloudHu.MyBatis.Mapper.UserMapper;
 import com.CloudHu.MyBatis.POJO.User;
+import com.CloudHu.MyBatis.Utils.SqlSessionUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -155,4 +156,63 @@ public class test {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testGetUserByLike(){
+        try {
+            //加载核心配置文件
+            InputStream is = Resources.getResourceAsStream("mybatis-config.xml");
+            //获取sqlSessionFactoryBuilder
+            SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+            //使用配置文件创建的流来获取sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(is);
+            //获取sqlSession
+            SqlSession sqlSession=sqlSessionFactory.openSession(true);
+            //获取Mapper接口的实例对象
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            //测试功能
+            List<User> list = userMapper.getUserByLike("修改后");
+            for (User u : list) {
+                System.out.println(list);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteMore(){
+        try {
+            //加载核心配置文件
+            InputStream is = Resources.getResourceAsStream("mybatis-config.xml");
+            //获取sqlSessionFactoryBuilder
+            SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+            //使用配置文件创建的流来获取sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(is);
+            //获取sqlSession
+            SqlSession sqlSession=sqlSessionFactory.openSession(true);
+            //获取Mapper接口的实例对象
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            //测试功能
+            userMapper.deleteMore("1,2,3");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testGetUserByDynamicTableName(){
+        try {
+            //获取sqlSession
+            SqlSession sqlSession = SqlSessionUtils.getSqlSession();
+            //获取Mapper接口的实例对象
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            //测试功能
+            User user = userMapper.getUserByDynamicTableName("t_user",6);
+            System.out.println(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

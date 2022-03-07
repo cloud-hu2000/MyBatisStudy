@@ -19,4 +19,10 @@ public interface UserMapper {
     User checkLogin(String userName,String password);
 
     User checkLoginByParam(@Param("username") String userName, @Param("password")String password);
+
+    List<User> getUserByLike(@Param("username") String username);
+
+    int deleteMore(@Param("ids") String ids);
+
+    User getUserByDynamicTableName(@Param("tablename")String tablename,@Param("id")int id);
 }
