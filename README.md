@@ -4,6 +4,8 @@
 
 本笔记源于尚硅谷的教程再加上自己的总结，如果有不明白的地方需要参考原教程[MyBatis教程](https://www.bilibili.com/video/BV1VP4y1c7j7?p=25&spm_id_from=pageDriver)
 
+这篇笔记的逻辑比较乱，适合学习过后遗忘了某部分知识点的时候拿来复习，初学者最好不要看。
+
 ### 特性
 
 1.是一个半自动的ORM框架
@@ -331,8 +333,6 @@ sql在批量删除时需要用到引号，例如语句
 
 在mapper的映射文件中，因为两种传参的原理不同，这就导致在配置批量删除的方法时，只能使用${}的方式,[原理差别](#jump2)在上文处提过
 
-${}方式
-
 ```
 <!--int deleteMore(@Param("ids") String ids);-->
 <delete id="deleteMore">
@@ -344,7 +344,6 @@ ${}方式
 
 之前使用的都是固定的表名，若要将表名当做参数，只能使用${}方式，原因和上方提到一样
 
-${}方式
 ```
 <!--  User getUserByDynamicTableName(@Param("tablename")String tablename,@Param("id")int id);  -->
 <select id="getUserByDynamicTableName" resultType="com.CloudHu.MyBatis.POJO.User">
@@ -402,12 +401,12 @@ mybatis支持将下划线转为驼峰命名法，例如将Emp_name转为EmpName�
 <resultMap id="empResultMap" type="Emp">
 
     <!--主键-->
-    <!--property对应着sql的字段名，column对应着后端实体的属性名-->
-    <id property="eid" column="id"></id>
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <id property="id" column="eid"></id>
     
     <!--其他属性-->
-    <!--property对应着sql的字段名，column对应着后端实体的属性名-->
-    <result property="e_name" column="name"></result>
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <result property="name" column="e_name"></result>
     
 </resultMap>
 
@@ -416,5 +415,106 @@ mybatis支持将下划线转为驼峰命名法，例如将Emp_name转为EmpName�
 <select id="getAllEmp" resultMap="empResultMap">
     select * from t_emp
 </select>
+
+```
+
+#### 顺带提一句
+
+级联属性也可以使用resultMap来进行映射
+
+假如员工类中还有一个属性是部门类(Dept)，那么可以使用association来映射
+
+```
+<resultMap id="empResultMap" type="Emp">
+
+    <!--主键-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <id property="id" column="eid"></id>
+    
+    <!--其他属性-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <result property="name" column="e_name"></result>
+    
+    <!--部门类-->
+    <association  property="dept" column="Dept">
+        <id property="did" column="id"></id>
+        <result property="deptname" column="name"></result>
+    </association>
+    
+</resultMap>
+
+```
+
+或者使用分步查询（开发中最常使用）
+
+```
+<resultMap id="empResultMap" type="Emp">
+
+    <!--主键-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <id property="eid" column="eid"></id>
+    
+    <!--其他属性-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <result property="ename" column="e_name"></result>
+    
+    <!--部门类-->
+    <!--select:设置分布查询该使用哪个方法，这里使用的是现有的DeptMapper中的查询方法，就不用自己写了-->
+    <!--column:级联查询的连接条件，即使用did连接员工和部门信息-->
+    <association  property="dept" 
+                  select="com.CloudHu.Mybatis.DeptMapper.getDept"
+                  column="did">
+    </association>
+    
+</resultMap>
+```
+
+### 延迟加载
+
+既然都提到了级联的属性，那么顺便说说延迟加载的方法
+
+单独设置延迟加载，可以在association中加入fetchType属性，取值为eager/lazy（立即加载和延迟加载）
+
+
+```
+<association  property="dept" 
+              select="com.CloudHu.Mybatis.DeptMapper.getDept"
+              column="did"
+              fetchType="eager">
+</association>
+```
+
+
+或者是进行全局设置，在核心映射文件中加入以下语句
+
+```
+<!--设置延迟加载-->
+<settings>
+    <setting name="LazyLoadingEnabled" value="true"/>
+</settings>
+```
+
+### 一对多关系
+
+和前面多对一的比较像，就不多说明了。需要注意有差别的地方是collection以及ofType
+
+```
+<resultMap id="DeptResultMap" type="Emp">
+
+    <!--主键-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <id property="did" column="did"></id>
+    
+    <!--其他属性-->
+    <!--property对应着后端实体的属性名，column对应着sql的字段名-->
+    <result property="dname" column="d_name"></result>
+    
+    <!--员工集合-->
+    <collection property="emps" ofType="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="ename" column="ename"></result>
+    </collection>
+</resultMap>
+
 
 ```

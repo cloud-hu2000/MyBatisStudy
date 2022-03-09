@@ -5,31 +5,45 @@
 <mapper namespace="com.CloudHu.MyBatis.Mapper.UserMapper">
     <!--int insertUser(User user);-->
     <insert id="insertUser">
-        insert into t_user values (null,#{userName},#{password})
+        insert into t_user
+        values (null, #{userName}, #{password})
     </insert>
     <!--  void updateUser();  -->
     <update id="updateUser">
-        update t_user set username = '修改后的名字' where id = 4
+        update t_user
+        set username = '修改后的名字'
+        where id = 4
     </update>
     <!--  void deleteUser();  -->
     <delete id="deleteUser">
-        delete from t_user where id = 5
+        delete
+        from t_user
+        where id = 5
     </delete>
     <!--  User getUserById(int id);  -->
     <select id="getUserById" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user where id = ${id}
+        select *
+        from t_user
+        where id = ${id}
     </select>
     <!--  List<User> getAllUser();  -->
     <select id="getAllUser" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user
+        select *
+        from t_user
     </select>
     <!--  User checkLogin(String userName,String password);  -->
     <select id="checkLogin" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user where username = #{arg0} and password = #{arg1}
+        select *
+        from t_user
+        where username = #{arg0}
+          and password = #{arg1}
     </select>
     <!--  User checkLoginByParam(@Param("username") String userName, @Param("password")String password);  -->
     <select id="checkLoginByParam" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user where username = #{username} and password = #{password}
+        select *
+        from t_user
+        where username = #{username}
+          and password = #{password}
     </select>
     <!--List<User> getUserByLike(@Param("username") String username);-->
     <!--
@@ -38,17 +52,23 @@
       select * from t_user where username like "%"#{username}"%"
       -->
     <select id="getUserByLike" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from t_user where username like "%"#{username}"%"
+        select *
+        from t_user
+        where username like "%"#{username}"%"
     </select>
 
     <!--int deleteMore(@Param("ids") String ids);-->
     <delete id="deleteMore">
-        delete from t_user where id in (${ids})
+        delete
+        from t_user
+        where id in (${ids})
     </delete>
 
     <!--  User getUserByDynamicTableName(@Param("tablename")String tablename,@Param("id")int id);  -->
     <select id="getUserByDynamicTableName" resultType="com.CloudHu.MyBatis.POJO.User">
-        select * from ${tablename} where id = ${id}
+        select *
+        from ${tablename}
+        where id = ${id}
     </select>
 
 

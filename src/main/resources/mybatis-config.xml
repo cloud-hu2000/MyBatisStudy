@@ -3,6 +3,10 @@
 <configuration>
     <!--引入properties-->
     <properties resource="jdbc.properties"></properties>
+    <!--设置延迟加载-->
+    <settings>
+        <setting name="LazyLoadingEnabled" value="true"/>
+    </settings>
     <!--设置连接数据库的环境-->
     <environments default="development">
         <environment id="development">
