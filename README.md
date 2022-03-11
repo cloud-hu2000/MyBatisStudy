@@ -518,3 +518,132 @@ mybatis支持将下划线转为驼峰命名法，例如将Emp_name转为EmpName�
 
 
 ```
+
+## 动态SQL
+
+### if语句
+
+使用if语句可以达到多条件查询的效果，具体映射文件如下
+
+```
+<!--  List<User> getUserByCondition(User user);  -->
+<select id="getUserByCondition" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user where 1=1
+    <if test="userName != null and userName != '' ">
+        and username = #{userName}
+    </if>
+    <if test="password != null and password != '' ">
+        and password = #{password}
+    </if>
+</select>
+```
+
+注意：如果不在where后面加1=1，两个if都不执行的时候语句就会变成
+
+`select * from t_user where`
+
+
+### where
+
+上边的方式比较憨，因为where是定死了的，其实有一个where标签可以用来解决这种情况。where标签会自动生成关键字，并且把if标签中中多余的and和or去掉
+
+```
+<<!--  List<User> getUserByCondition(User user);  -->
+<select id="getUserByCondition" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user
+    <where>
+        <if test="userName != null and userName != '' ">
+            username = #{userName}
+        </if>
+        <if test="password != null and password != '' ">
+            and password = #{password}
+        </if>
+    </where>
+</select>
+```
+
+### trim
+
+利用trim也可以实现上面的效果，trim用于去掉或添加标签中的内容
+
+常用属性：
+
+prefix|suffix：在trim标签中的内容的前面或后面添加某些内容
+
+prefixOverrides|suffixOverrides：在trim标签中的内容的前面或后面去掉某些内容
+
+
+```
+<!--  List<User> getUserByCondition(User user);  -->
+<select id="getUserByCondition" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user
+    <trim prefix="where" prefixOverrides="and">
+        <if test="userName != null and userName != '' ">
+            and username = #{userName}
+        </if>
+        <if test="password != null and password != '' ">
+            and password = #{password}
+        </if>
+    </trim>
+</select>
+```
+
+此外，当标签中没有内容被执行时，trim标签不会发挥作用，即当传入属性都为空时，trim是不会添加where的。
+
+### choose,when,otherwise
+
+其实就相当于switch，case，default
+
+```
+<!--  List<User> getUserByCondition(User user);  -->
+<select id="getUserByCondition" resultType="com.CloudHu.MyBatis.POJO.User">
+    select * from t_user
+    <where>
+        <choose>
+            <when test="userName != null and userName != '' ">
+                username = #{userName}
+            </when>
+            <when test="password != null and password != '' ">
+                password = #{password}
+            </when>
+            <otherwise>1 = 1</otherwise>
+        </choose>
+    </where>
+</select>
+```
+
+### foreach
+
+foreach用于访问集合，collection是集合名（注意需要在接口方法的参数前加上@Param），item是每个元素的名字，separator是分隔符，open指定整个foreach语句的开头符号，close指定整个foreach语句的终结符号
+
+```
+<!--  int deleteMoreByArray(Integer[] uids);  -->
+<delete id="deleteMoreByArray">
+    delete from t_user where id in
+    <foreach collection="uids" item="uid" separator="," open ="(" close=")">
+        #{uid}
+    </foreach>
+</delete>
+```
+
+### sql
+
+sql标签相当于一个总体的别名，可以提高代码的复用性
+
+使用方法如下:
+
+以下面的sql语句为例
+
+`select id,username,password form t_user`
+
+改写成
+
+```
+<sql id="userInfo">id,username,password</sql>
+
+<select id="getAllUser" resultType="com.CloudHu.MyBatis.POJO.User">
+    select <include refid="userInfo"></include> from t_user
+</select>
+```
+
+## Mybatis的缓存

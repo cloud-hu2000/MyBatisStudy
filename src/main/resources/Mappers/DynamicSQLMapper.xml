@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.CloudHu.MyBatis.Mapper.DynamicSQLMapper">
+    <!--  List<User> getUserByCondition(User user);  -->
+    <select id="getUserByCondition" resultType="com.CloudHu.MyBatis.POJO.User">
+        select * from t_user
+        <where>
+            <choose>
+                <when test="userName != null and userName != '' ">
+                    username = #{userName}
+                </when>
+                <when test="password != null and password != '' ">
+                    password = #{password}
+                </when>
+                <otherwise>1 = 1</otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--  int deleteMoreByArray(Integer[] uids);  -->
+    <delete id="deleteMoreByArray">
+        delete from t_user where id in
+        <foreach collection="uids" item="uid" separator="," open ="(" close=")">
+            #{uid}
+        </foreach>
+    </delete>
+</mapper>

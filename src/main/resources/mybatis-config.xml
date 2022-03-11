@@ -3,10 +3,10 @@
 <configuration>
     <!--引入properties-->
     <properties resource="jdbc.properties"></properties>
-    <!--设置延迟加载-->
-    <settings>
-        <setting name="LazyLoadingEnabled" value="true"/>
-    </settings>
+<!--    &lt;!&ndash;设置延迟加载&ndash;&gt;-->
+<!--    <settings>-->
+<!--        <setting name="LazyLoadingEnabled" value="true"/>-->
+<!--    </settings>-->
     <!--设置连接数据库的环境-->
     <environments default="development">
         <environment id="development">
@@ -24,5 +24,6 @@
     <!--引入映射文件-->
     <mappers>
         <mapper resource="Mappers/UserMapper.xml"/>
+        <mapper resource="Mappers/DynamicSQLMapper.xml"/>
     </mappers>
 </configuration>
