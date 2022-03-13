@@ -773,7 +773,7 @@ false。
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
                         connectionURL="jdbc:mysql://localhost:3306/mybatis?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"
                         userId="root"
-                        password="zxcvbnm,./123">
+                        password="123456">
         </jdbcConnection>
         <!-- javaBean的生成策略-->
         <javaModelGenerator targetPackage="com.CloudHu.MyBatis.bean" targetProject=".\src\main\java">
